@@ -11,7 +11,7 @@ export PATH=$MAIN_ROOT/tools/moses/scripts/tokenizer/:$MAIN_ROOT/tools/moses/scr
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$MAIN_ROOT/tools/chainer_ctc/ext/warp-ctc/build
 if [ -e $MAIN_ROOT/tools/venv/etc/profile.d/conda.sh ]; then
     source $MAIN_ROOT/tools/venv/etc/profile.d/conda.sh && conda deactivate && conda activate
-else
+elif [ -e $MAIN_ROOT/tools/venv/bin/activate ]; then
     source $MAIN_ROOT/tools/venv/bin/activate
 fi
 export PATH=$MAIN_ROOT/utils:$MAIN_ROOT/espnet/bin:$PATH

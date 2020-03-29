@@ -8,7 +8,7 @@
 
 # general configuration
 backend=pytorch # chainer or pytorch
-stage=-1        # start from -1 if you need to start from data download
+stage=0        # start from -1 if you need to start from data download
 stop_stage=100
 ngpu=1          # number of gpus ("0" uses cpu, otherwise use gpu)
 nj=16           # number of parallel jobs for decoding
@@ -46,10 +46,10 @@ tgt_case=tc
 
 # Set this to somewhere where you want to put your data, or where
 # someone else has already put it.
-must_c=/n/rd11/corpora_8/MUSTC_v1.0
+must_c=$SCRATCH/Data/MUSTC_v1.0
 
 # target language related
-tgt_lang=de
+tgt_lang=nl
 # you can choose from de, es, fr, it, nl, pt, ro, ru
 # if you want to train the multilingual model, segment languages with _ as follows:
 # e.g., tgt_lang="de_es_fr"

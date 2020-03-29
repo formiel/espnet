@@ -1,0 +1,113 @@
+module load \
+    pytorch-gpu/py3/1.4.0 \
+    automake/1.16.1 \
+    autoconf/2.69 \
+    git/2.21.0 \
+    sox/14.4.2 \
+    subversion/1.9.7 \
+    openblas/0.3.6 \
+    intel-mkl/19.0.5 \
+    ffmpeg/N-94431
+
+After installing kaldi, make sure there's no kaldi/tools/env.sh and no kaldi/tools/python/python
+
+cd kaldi/tools
+bash extras/check_dependencies.sh
+touch python/.use_default_python
+make -j$(nproc)
+
+cd kaldi/src
+./configure --shared \
+    --use-cuda=no \
+    --mkl-root=/gpfslocalsys/intel/parallel_studio_xe_2019_update5_cluster_edition/compilers_and_libraries_2019.5.281/linux/mkl \
+    --mkl-libdir=/gpfslocalsys/intel/parallel_studio_xe_2019_update5_cluster_edition/compilers_and_libraries_2019.5.281/linux/mkl/lib/intel64_lin
+make depend -j$(nproc)
+make -j$(nproc)
+
+DOWNLOAD_DIR=$WORK/setup/ make -j10
+
+ZLIB
+rm -f /home/khue/.local/lib/libz.a
+cp libz.a /home/khue/.local/lib
+chmod 644 /home/khue/.local/lib/libz.a
+cp libz.so.1.2.11 /home/khue/.local/lib
+chmod 755 /home/khue/.local/lib/libz.so.1.2.11
+rm -f /home/khue/.local/share/man/man3/zlib.3
+cp zlib.3 /home/khue/.local/share/man/man3
+chmod 644 /home/khue/.local/share/man/man3/zlib.3
+rm -f /home/khue/.local/lib/pkgconfig/zlib.pc
+cp zlib.pc /home/khue/.local/lib/pkgconfig
+chmod 644 /home/khue/.local/lib/pkgconfig/zlib.pc
+rm -f /home/khue/.local/include/zlib.h /home/khue/.local/include/zconf.h
+cp zlib.h zconf.h /home/khue/.local/include
+chmod 644 /home/khue/.local/include/zlib.h /home/khue/.local/include/zconf.h
+
+export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
+
+
+WGET:
+dependencies (should be installed in order): gmp, nettle, openssl, unbound, gnutls
+
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /gpfswork/rech/wod/umz16dj/kaldi/tools/openfst-1.6.7/lib/fst
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /gpfswork/rech/wod/umz16dj/kaldi/tools/openfst-1.6.7/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+/gpfslocalsys/intel/parallel_studio_xe_2019_update5_cluster_edition/compilers_and_libraries_2019.5.281/linux/mkl/lib/intel64_lin
+
+
+
+ESPNET
+
+cd espnet
+ln -s $WORK/kaldi tools/kaldi
+TMPDIR=$WORK/tmp pip install --user . -vv
+cd tools
+git clone https://github.com/moses-smt/mosesdecoder.git moses
+
+
+salloc --nodes=1 --ntasks=4 --cpus-per-task=10 --ntasks-per-node=4 --gres=gpu:4 --partition=gpu_p1 --time=20:00:00
+srun --ntasks=4 --gres=gpu:4 --pty bash 
+
+./run.sh  --stage 0 --stop-stage 2
+
+./run.sh  --ngpu 4 --stage 4 --stop-stage 5 --train-config ./conf/train.yaml |& tee output.txt
+
+rsync -chavzP --stats \
+    umz16dj@jean-zay.idris.fr:/gpfswork/rech/wod/umz16dj/espnet/egs/must_c/st1/tensorboard \
+    /Users/khue/github/formiel/espnet/egs/must_c/st1/
+
+

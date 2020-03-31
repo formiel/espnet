@@ -10,6 +10,7 @@ module load \
     ffmpeg/N-94431
 
 After installing kaldi, make sure there's no kaldi/tools/env.sh and no kaldi/tools/python/python
+(otherwise there will be "no module sentencepiece" etc.)
 
 cd kaldi/tools
 bash extras/check_dependencies.sh
@@ -109,5 +110,3 @@ srun --ntasks=4 --gres=gpu:4 --pty bash
 rsync -chavzP --stats \
     umz16dj@jean-zay.idris.fr:/gpfswork/rech/wod/umz16dj/espnet/egs/must_c/st1/tensorboard \
     /Users/khue/github/formiel/espnet/egs/must_c/st1/
-
-
